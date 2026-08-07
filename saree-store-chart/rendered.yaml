@@ -1,0 +1,205 @@
+---
+# Source: saree-store-chart/templates/backend/backend-secret.yaml
+apiVersion: v1
+
+kind: Secret
+
+metadata:
+  name: backend-secret
+
+type: Opaque
+
+stringData:
+  MONGO_URI: "mongodb://mongodb-service:27017/saree-store"
+  JWT_SECRET: "your_super_secret_jwt_key_change_in_production_min_32_chars"
+
+  CLOUDINARY_CLOUD_NAME: "dbvpxcdso"
+  CLOUDINARY_API_KEY: "547757451292692"
+  CLOUDINARY_API_SECRET: "VTFaeqDvjtA2Dka0Eo4h7NBAh7s"
+
+  EASEBUZZ_KEY: "M8YLX5X9Q"
+  EASEBUZZ_SALT: "07JHRA9CQ"
+
+  STRIPE_SECRET_KEY: "sk_test_your_stripe_secret_key"
+
+  SMTP_EMAIL: "tanveerchauhan604@gmail.com"
+  SMTP_PASSWORD: "lmnw ifhj udmg roqj"
+---
+# Source: saree-store-chart/templates/backend/backend-config.yaml
+apiVersion: v1
+kind: ConfigMap
+
+metadata:
+  name: backend-config
+
+data:
+  PORT: "5000"
+  NODE_ENV: "development"
+  JWT_EXPIRE: "1d"
+  JWT_COOKIE_EXPIRE: "1"
+  EASEBUZZ_ENV: "test"
+  SMTP_HOST: "smtp.gmail.com"
+  SMTP_PORT: "587"
+  FROM_NAME: "Saaj"
+  FROM_EMAIL: "tanveerchauhan471@gmail.com"
+  FRONTEND_URL: "http://localhost:3000"
+  REDIS_URL: "redis://localhost:6379"
+---
+# Source: saree-store-chart/templates/backend/backend-service.yaml
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: backend-service
+
+spec:
+  selector:
+    app: backend
+
+  ports:
+  - port: 5000
+    targetPort: 5000
+
+  type: ClusterIP
+---
+# Source: saree-store-chart/templates/frontend/frontend-service.yaml
+apiVersion: v1
+
+kind: Service
+
+metadata:
+  name: frontend-service
+
+spec:
+  selector:
+    app: frontend
+
+  ports:
+  - port: 80
+    targetPort: 80
+
+  type: ClusterIP
+---
+# Source: saree-store-chart/templates/mongodb/mongodb-service.yaml
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: mongodb-service
+
+spec:
+  clusterIP: None
+
+  selector:
+    app: mongodb
+
+  ports:
+    - port: 27017
+      targetPort: 27017
+---
+# Source: saree-store-chart/templates/backend/backend-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: backend
+
+spec:
+  replicas: 3
+
+  selector:
+    matchLabels:
+      app: backend
+
+  template:
+    metadata:
+      labels:
+        app: backend
+
+    spec:
+      containers:
+      - name: backend
+        image: "tanveeraws/saree-backend:v1"
+
+        ports:
+        - containerPort: 5000
+
+        envFrom:
+        - configMapRef:
+            name: backend-config
+
+        - secretRef:
+            name: backend-secret
+---
+# Source: saree-store-chart/templates/frontend/frontend-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: frontend
+
+spec:
+  replicas: 3
+
+  selector:
+    matchLabels:
+      app: frontend
+
+  template:
+    metadata:
+      labels:
+        app: frontend
+
+    spec:
+      containers:
+      - name: frontend
+        image: "tanveeraws/saree-frontend:v3"
+
+        ports:
+        - containerPort: 3000
+---
+# Source: saree-store-chart/templates/mongodb/mongodb-statefulset.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+
+metadata:
+  name: mongodb
+
+spec:
+  serviceName: mongodb-service
+
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: mongodb
+
+  template:
+    metadata:
+      labels:
+        app: mongodb
+
+    spec:
+      containers:
+      - name: mongodb
+
+        image: mongo:7
+
+        ports:
+        - containerPort: 27017
+
+        volumeMounts:
+        - name: mongodb-storage
+          mountPath: /data/db
+
+  volumeClaimTemplates:
+  - metadata:
+      name: mongodb-storage
+
+    spec:
+      accessModes:
+      - ReadWriteOnce
+
+      resources:
+        requests:
+          storage: 1Gi

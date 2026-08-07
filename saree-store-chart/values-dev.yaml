@@ -1,0 +1,11 @@
+frontend:
+  replicaCount: 1
+  image:
+    repository: tanveeraws/saree-frontend
+    tag: v3
+
+backend:
+  replicaCount: 1
+  image:
+    repository: tanveeraws/saree-backend
+    tag: v1
