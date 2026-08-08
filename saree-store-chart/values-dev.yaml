@@ -1,11 +1,16 @@
+backend:
+  replicaCount: 1
+  image:
+    repository: tanveeraws/saree-backend
+    tag: v1
+
 frontend:
   replicaCount: 1
   image:
     repository: tanveeraws/saree-frontend
     tag: v3
 
-backend:
-  replicaCount: 1
+mongodb:
   image:
-    repository: tanveeraws/saree-backend
-    tag: v1
+    repository: mongo
+    tag: "7"

@@ -2,10 +2,10 @@ apiVersion: apps/v1
 kind: StatefulSet
 
 metadata:
-  name: mongodb
+  name: {{ .Release.Name }}-mongodb
 
 spec:
-  serviceName: mongodb-service
+  serviceName: {{ .Release.Name }}-mongodb-service
 
   replicas: 1
 
