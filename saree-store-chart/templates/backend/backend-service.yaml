@@ -3,13 +3,23 @@ kind: Service
 
 metadata:
   name: {{ .Release.Name }}-backend-service
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: backend
+    release: {{ .Release.Name }}
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "5000"
 
 spec:
   selector:
     app: backend
+    release: {{ .Release.Name }}    # ⬅️ ye fix aapka current bug solve karega
 
   ports:
-  - port: 5000
+  - name: http
+    port: 5000
     targetPort: 5000
+    protocol: TCP
 
   type: ClusterIP

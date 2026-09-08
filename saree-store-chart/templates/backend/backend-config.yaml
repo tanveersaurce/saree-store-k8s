@@ -3,6 +3,7 @@ kind: ConfigMap
 
 metadata:
   name: {{ .Release.Name }}-backend-config
+  namespace: {{ .Release.Namespace }}
 
 data:
   PORT: "5000"

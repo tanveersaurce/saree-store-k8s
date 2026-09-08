@@ -3,42 +3,87 @@ kind: StatefulSet
 
 metadata:
   name: {{ .Release.Name }}-mongodb
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: mongodb
+    app.kubernetes.io/instance: {{ .Release.Name }}
 
 spec:
   serviceName: {{ .Release.Name }}-mongodb-service
-
-  replicas: 1
+  replicas: {{ .Values.mongodb.replicaCount | default 1 }}
 
   selector:
     matchLabels:
-      app: mongodb
+      app.kubernetes.io/name: mongodb
+      app.kubernetes.io/instance: {{ .Release.Name }}
+
+  podManagementPolicy: OrderedReady
 
   template:
     metadata:
       labels:
-        app: mongodb
+        app.kubernetes.io/name: mongodb
+        app.kubernetes.io/instance: {{ .Release.Name }}
 
     spec:
       containers:
-      - name: mongodb
+        - name: mongodb
+          image: "{{ .Values.mongodb.image.repository }}:{{ .Values.mongodb.image.tag }}"
+          imagePullPolicy: {{ .Values.mongodb.image.pullPolicy | default "IfNotPresent" }}
 
-        image: mongo:7
+          ports:
+            - containerPort: 27017
+              name: mongodb
 
-        ports:
-        - containerPort: 27017
+          env:
+            - name: MONGO_INITDB_ROOT_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-mongodb-secret
+                  key: username
 
-        volumeMounts:
-        - name: mongodb-storage
-          mountPath: /data/db
+            - name: MONGO_INITDB_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-mongodb-secret
+                  key: password
+
+          volumeMounts:
+            - name: mongodb-data
+              mountPath: /data/db
+
+          resources:
+            requests:
+              cpu: 200m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+
+          livenessProbe:
+            tcpSocket:
+              port: 27017
+            initialDelaySeconds: 20
+            periodSeconds: 20
+            timeoutSeconds: 5
+
+          readinessProbe:
+            tcpSocket:
+              port: 27017
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
 
   volumeClaimTemplates:
-  - metadata:
-      name: mongodb-storage
+    - metadata:
+        name: mongodb-data
 
-    spec:
-      accessModes:
-      - ReadWriteOnce
+      spec:
+        accessModes:
+          - ReadWriteOnce
 
-      resources:
-        requests:
-          storage: 1Gi
+        storageClassName: {{ .Values.mongodb.storageClass | default "standard" }}
+
+        resources:
+          requests:
+            storage: {{ .Values.mongodb.storageSize | default "2Gi" }}

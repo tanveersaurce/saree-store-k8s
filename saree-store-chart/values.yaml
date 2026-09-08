@@ -161,20 +161,21 @@ tolerations: []
 affinity: {}
 
 
-
 frontend:
-  replicaCount: 3
   image:
     repository: tanveeraws/saree-frontend
-    tag: v3
+    tag: v12
+  replicaCount: 1
 
 backend:
-  replicaCount: 3
   image:
     repository: tanveeraws/saree-backend
     tag: v1
+  replicaCount: 1
 
 mongodb:
   image:
     repository: mongo
     tag: "7"
+  username: "admin"
+  password: "changeme123"
