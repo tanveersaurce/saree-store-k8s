@@ -165,7 +165,7 @@ frontend:
   image:
     repository: tanveeraws/saree-frontend
     tag: v12
-  replicaCount: 1
+  replicaCount: 2
 
 backend:
   image:
