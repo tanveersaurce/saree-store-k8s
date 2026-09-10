@@ -164,18 +164,18 @@ affinity: {}
 frontend:
   image:
     repository: tanveeraws/saree-frontend
-    tag: v12
+    tag: v14
   replicaCount: 2
 
 backend:
   image:
     repository: tanveeraws/saree-backend
-    tag: v1
+    tag: v14
   replicaCount: 2
 
 mongodb:
   image:
     repository: mongo
-    tag: "7"
+    tag: v14
   username: "admin"
   password: "changeme123"
