@@ -165,3 +165,17 @@ frontend:
   image:
     repository: tanveeraws/saree-frontend
     tag: v18
+  replicaCount: 2
+
+backend:
+  image:
+    repository: tanveeraws/saree-backend
+    tag: v18
+  replicaCount: 2
+
+mongodb:
+  image:
+    repository: mongo
+    tag: "7"
+  username: "admin"
+  password: "changeme123"
