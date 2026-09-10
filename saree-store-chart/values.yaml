@@ -164,13 +164,13 @@ affinity: {}
 frontend:
   image:
     repository: tanveeraws/saree-frontend
-    tag: v18
+    tag: v19
   replicaCount: 2
 
 backend:
   image:
     repository: tanveeraws/saree-backend
-    tag: v18
+    tag: v19
   replicaCount: 2
 
 mongodb:
