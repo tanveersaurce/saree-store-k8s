@@ -170,7 +170,7 @@ frontend:
 backend:
   image:
     repository: tanveeraws/saree-backend
-    tag: v1
+    tag: v999-does-not-exist
   replicaCount: 2
 
 mongodb:
